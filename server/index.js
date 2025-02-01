@@ -22,7 +22,7 @@ const { Pool } = pg;
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
-db.connect((err) => {
+pool.connect((err) => {
   if (err) {
     console.error("Connection error:", err.stack);
   } else {
@@ -51,7 +51,7 @@ app.use(passport.session());
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(__dirname+'/public'))
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://noterapp.vercel.app','http://localhost:5174','https://senseibles-client.vercel.app/'],
+    origin: ['http://localhost:5173','http://localhost:5174','https://senseibles-client.vercel.app/'],
     credentials: true,
 
 }));
@@ -110,7 +110,7 @@ app.post("/register",async(req,res)=>{
         else{
             console.log("hashed pass :- ",hash);
             try{
-                const result = await db.query("INSERT INTO users(username,password,name) values($1,$2,$3) RETURNING * " ,[user,hash,name]);
+                const result = await pool.query("INSERT INTO users(username,password,name) values($1,$2,$3) RETURNING * " ,[user,hash,name]);
                 res.sendStatus(201)
             }catch(error){
                 console.log("Error registering in db:- "+error);
@@ -122,7 +122,7 @@ app.post("/register",async(req,res)=>{
 
 passport.use(new Strategy(async (username, password, cb) => {
     try {
-        const result = await db.query("SELECT * FROM users WHERE username=$1", [username]);
+        const result = await pool.query("SELECT * FROM users WHERE username=$1", [username]);
         if (result.rows.length > 0) {
             const user = result.rows[0];
             const storedHash = user.password;
@@ -171,7 +171,7 @@ passport.deserializeUser((user,cb)=>{
 
 app.get("/adm-events",async(req,res)=>{
     try{
-        const result = await db.query("SELECT * FROM EVENTS");
+        const result = await pool.query("SELECT * FROM EVENTS");
         console.log(result.rows);
         res.json(result.rows);
     }catch(err){
@@ -189,7 +189,7 @@ app.post("/adm-events", async (req, res) => {
 
     try {
         // Query to insert the event details into the database
-        const result = await db.query(
+        const result = await pool.query(
             `INSERT INTO events (event_name, event_description, event_date, event_time, event_location, event_image_url) 
              VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
             [event_name, event_description, event_date, event_time, event_location, event_image_url]
@@ -214,7 +214,7 @@ app.get("/adm-events/:id", async (req, res) => {
   
     try {
       // Fetch event details by ID from the database
-      const result = await db.query("SELECT * FROM EVENTS WHERE event_id = $1", [id]);
+      const result = await pool.query("SELECT * FROM EVENTS WHERE event_id = $1", [id]);
   
       if (result.rows.length === 0) {
         return res.status(404).send("Event not found");
@@ -239,7 +239,7 @@ app.get("/adm-events/:id", async (req, res) => {
     console.log(req.body.e_name);
     console.log(req.params.id);
     try{
-        const result = await db.query(
+        const result = await pool.query(
             "UPDATE EVENTS SET event_name = $1, event_description = $2, event_date = $3, event_time = $4, event_location = $5, event_image_url = $6 WHERE event_id = $7",
             [event_name, event_description, event_date, event_time, event_location, event_image_url, event_id]
           );
@@ -253,7 +253,7 @@ app.get("/adm-events/:id", async (req, res) => {
     console.log("Delete requested for ID:", id);
 
     try {
-        const result = await db.query("DELETE FROM EVENTS WHERE event_id = $1 RETURNING *", [id]);
+        const result = await pool.query("DELETE FROM EVENTS WHERE event_id = $1 RETURNING *", [id]);
 
         if (result.rowCount === 0) {
             return res.status(404).json({ message: "Event not found" });
