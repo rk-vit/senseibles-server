@@ -71,7 +71,9 @@ app.get('/auth/protect', (req, res) => {
     }
   });
   
-
+app.get("/check",(req,res)=>{
+    res.json("Okay");
+})
 app.post("/login", (req, res, next) => {
     console.log("login requested");
     passport.authenticate("local", (err, user, info) => {
