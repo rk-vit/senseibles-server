@@ -11,6 +11,7 @@ import session  from "express-session";
 import dotenv from "dotenv"
 const app = express();
 const saltRounds = 10;
+/*
 const db = new pg.Client({
     user:"postgres",
     host:"localhost",
@@ -18,6 +19,7 @@ const db = new pg.Client({
     password:"rk@vit",
     port:5432
   })
+*/
 const { Pool } = pg;
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
@@ -31,7 +33,7 @@ pool.connect((err) => {
 });
 
 
-app.set("trust proxy",1);
+//app.set("trust proxy",1);
 app.use(
     session({
       secret: "TOPSECRET",
