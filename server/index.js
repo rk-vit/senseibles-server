@@ -33,7 +33,7 @@ pool.connect((err) => {
 });
 
 
-//app.set("trust proxy",1);
+app.set("trust proxy",1);
 app.use(
     session({
       secret: "TOPSECRET",
