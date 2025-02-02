@@ -53,7 +53,7 @@ app.use(passport.session());
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(__dirname+'/public'))
 app.use(cors({
-    origin: "https://senseibles-client.vercel.app/",
+    origin: "https://senseibles-client.vercel.app",
     credentials: true,
 
 }));
