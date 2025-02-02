@@ -53,7 +53,7 @@ app.use(passport.session());
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(__dirname+'/public'))
 app.use(cors({
-    origin: "*",
+    origin: "https://senseibles-client.vercel.app/",
     credentials: true,
 
 }));
@@ -61,6 +61,10 @@ app.use(bodyParser.urlencoded({extended:true}))
 app.use(express.json());
 const port = 3000;
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+});
 
 // auth Logic
 app.get('/auth/protect', (req, res) => {
